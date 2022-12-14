@@ -17,6 +17,7 @@ import subprocess
 import plotly.graph_objects as go
 
 app = Dash(__name__,external_stylesheets=[dbc.themes.BOOTSTRAP])
+banks = MultiBank()
 object_type = dcc.Dropdown(['Новостройка', 'Вторичка'],id='object_type')
 rooms = dcc.Checklist(['1','2','3','4','5','6+','Студия','Свободная планировка'],inline = True,labelStyle={'margin-right':'15px'},inputStyle={'margin-right':'2px'},id = 'rooms')
 minprice = dbc.InputGroup([dbc.Input(type = 'number',placeholder="от",min = 0,max = 900_000_000_000,id = 'minprice',step=1),dbc.InputGroupText("₽")])
@@ -65,8 +66,8 @@ salary = dbc.InputGroup([dbc.Input(type = 'number',min = 0,id = 'salary',step=1)
 percent_on_mortgage = dbc.InputGroup([dbc.Input(type = 'number',min = 0,max = 100,id = 'percent_on_mortgage',step=1),dbc.InputGroupText("%")])
 
 region = dbc.Input(type='text',id='region', pattern=r"^[а-яА-Я,\.-\w\s]{0,50}$")
-app.layout = dbc.Container(style={'margin':'1px'},children=[
-    dbc.Form(style={'width':'50%'},class_name = 'card p-1',children=[
+html_form = html.Div(style = {'width':'50%'},children=[
+    dbc.Form(class_name = 'card p-1',children=[
     dbc.Row(
         [
             dbc.Row([dbc.Col([dbc.Label("Тип квартиры",width = 'auto',style={'font-size':'17px'})],style={'margin-right':'20px'})]),
@@ -133,7 +134,7 @@ app.layout = dbc.Container(style={'margin':'1px'},children=[
 
 ]),
 
-dbc.Form(style={'width':'50%','margin-top':'20px'},class_name = 'card p-1',children =[
+dbc.Form(class_name = 'card p-1',style={'margin-top':'20px'},children =[
     dbc.Row(
         [
             dbc.Row([dbc.Label("Тип ипотеки", width="auto",style={'font-size':'17px'})]),
@@ -163,9 +164,12 @@ dbc.Form(style={'width':'50%','margin-top':'20px'},class_name = 'card p-1',child
         style={'margin-bottom':'20px','margin-left':'2px','margin-right':'2px'}
     ),
     dbc.Row(dbc.Button("Count", color="primary",style={'width':'20%'},id='count'),justify='center')
-]), 
-   html.Div(id='montgage')
-])
+])])
+
+app.layout = dbc.Container([
+    dbc.Col(html_form,width = '45%'),
+    dbc.Col(id = 'mortgage',width = '42%')
+],style={'margin-left':'0px','margin-right':'0px'})
 
 
 def get_region_id(reg_name):
@@ -257,7 +261,7 @@ def get_figure(df):
 
 form = ['rooms','region','object_type','minprice','maxprice','minarea','maxarea','min_living_area','max_living_area',
         'min_kitchen_area','max_kitchen_area','minfloor','maxfloor','floor_type','min_house_year','max_house_year']
-@app.callback(Output('montgage','children'),
+@app.callback(Output('mortgage','children'),
               Input('count', 'n_clicks'),
               State('rooms', 'value'),
               State('region', 'value'),
@@ -316,7 +320,8 @@ def get_map(clicks,rooms,region,object_type,minprice,maxprice,minarea,maxarea,mi
             del temp['coordinates']
             flats.append(temp)
         df = pd.DataFrame.from_records(flats)
-        print(df)
+        df['price'] = df['price'].astype('int')
+        print(df.info())
         fig = get_figure(df)
 
         mortgage_info = dict()
@@ -330,17 +335,19 @@ def get_map(clicks,rooms,region,object_type,minprice,maxprice,minarea,maxarea,mi
                 loan_program = 1
             else:
                 loan_program = 2
-        mortgage_info['LoanProgram'] = loan_program
-        mortgage_info['PropertyCost'] = 1000000
-        #df['price'].mean()
+        if loan_program != 0:
+            mortgage_info['LoanProgram'] = loan_program
+        mortgage_info['PropertyCost'] = df['price'].mean()
         if down_payment != None:
             mortgage_info['InitialFee'] = down_payment
         print(mortgage_info)
-        banks = MultiBank()
         print(banks.request(mortgage_info))
-        
-        return html.Label()
-        #dcc.Graph(figure = fig,style={'width': '90vh', 'height': '90vh'})
+        dcc.Graph(figure = fig,style={'width': '90vh', 'height': '90vh'})
+        return html.Div([
+            dbc.Row([dcc.Graph(figure = fig,style={'width': '90vh', 'height': '90vh'}),
+            html.Label(f'Средняя стоимость квартиры = {round(df.price.mean())}')]),
+            dbc.Row(#вставить Div сюда)
+        ])
     else:
         return  html.Label()
 

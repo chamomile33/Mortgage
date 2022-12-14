@@ -37,7 +37,7 @@ class SpidercianitemSpider(scrapy.Spider):
     def parse_flat(self,response,price,url):
         item = SpiderCianItem()
         item['address'] = ' '.join(response.xpath('//address//a/text()').extract())
-        item['price'] = price[:-1]
+        item['price'] = price[:-2].replace(' ','')
         item['url'] = url
         ret = response.xpath('//script[contains(text(),"coordinates")]/text()').extract()[0]
         coordinates = eval(re.findall('(?<=coordinates\":)[^}]*}',ret)[0])
