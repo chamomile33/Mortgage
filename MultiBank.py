@@ -21,7 +21,15 @@ class MultiBank:
             "PropertyCost" - number, property cost \\
             "InitialFee" - number, initial payment \\
             "LoanTerm" - number of years for paying the loan \\
-            Missing parameters are filled with standard values.
+            Missing parameters are filled with standard values.\\
+            \\
+            Standard response:\\
+            "CreditSum": сумма кредита
+            "CreditRate": процентная ставка
+            "MonthlyPayment": месячный платеж
+            "Term": длительность
+            "OverPayment": переплата
+            "TotalCost": Итоговая стоимость квартиры
         """
 
         if userdata is None:
@@ -53,7 +61,7 @@ class MultiBank:
 
     def __init__(self, params=None):
         self._standard_request_description = {
-            "LoanProgram": 0,  # 1..4
+            "LoanProgram": 1,  # 1..4
             "RegionCode": 77,  # That's Moscow
             "PropertyCost": 3000000,  # Property cost -- the cost of a real estate you want to buy
             "InitialFee": 600000,  # The initial payment

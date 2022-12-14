@@ -4,6 +4,7 @@ from MultiBank import MultiBank
 from banks.tink import tink_request
 from banks.def_calculator import calc
 parser = MultiBank()
+parser.request()
 data = {
     "LoanProgram": 1,
     "RegionCode": 77,
