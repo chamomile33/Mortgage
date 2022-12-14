@@ -13,14 +13,11 @@ data = {
     "LoanTerm": 25,
 }
 
-print(calc(rate=10.9, term=2, deposit=200000, cost=1200000))
 
-# tink_init()
-# tink_request("aboba")
+response = parser.request(data)
 
-
-# response = parser.request(data)
-
-# print(json.dumps(response['Sber'], indent=4))
-# print('-'*40)
-# print(json.dumps(response['VTB'], indent=4))
+print('-'*40)
+for key in response:
+    print(key)
+    print(json.dumps(response[key], indent=4))
+    print('-'*40)

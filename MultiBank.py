@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 from banks.sber import sber_request
+from banks.tink import tink_request
 from banks.vtb import vtb_request
 
 
@@ -30,6 +31,7 @@ class MultiBank:
             "Term": длительность
             "OverPayment": переплата
             "TotalCost": Итоговая стоимость квартиры
+            "InitialFee": Первоначальный взнос
         """
 
         if userdata is None:
@@ -52,9 +54,10 @@ class MultiBank:
         return self._request(request_description)
 
     def _request(self, request_description):
+        request_description["InitialFee"] = max(request_description["InitialFee"], int(request_description["PropertyCost"]*0.15))
         response = {"Sber": sber_request(request_description),
                     "VTB": vtb_request(request_description),
-                    # "Tinkoff": tink_request(request_description),
+                    "Tinkoff": tink_request(request_description),
                     # "Alpha": alpha_request(request_description)
                     }
         return response

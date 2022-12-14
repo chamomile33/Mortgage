@@ -6,9 +6,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e773b9a5-aae7-4202-8c22-88ce1280eee9" name="Changes" comment="Initial Commit">
+    <list default="true" id="e773b9a5-aae7-4202-8c22-88ce1280eee9" name="Changes" comment="Deleted log files and added response description.">
+      <change afterPath="$PROJECT_DIR$/banks/alpha.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MultiBank.py" beforeDir="false" afterPath="$PROJECT_DIR$/MultiBank.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/banks/def_calculator.py" beforeDir="false" afterPath="$PROJECT_DIR$/banks/def_calculator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/banks/sber.py" beforeDir="false" afterPath="$PROJECT_DIR$/banks/sber.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/banks/tink.py" beforeDir="false" afterPath="$PROJECT_DIR$/banks/tink.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/banks/vtb.py" beforeDir="false" afterPath="$PROJECT_DIR$/banks/vtb.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mech.py" beforeDir="false" afterPath="$PROJECT_DIR$/mech.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -89,7 +94,7 @@
       <updated>1670478748219</updated>
       <workItem from="1670478749369" duration="7049000" />
       <workItem from="1670826884548" duration="10473000" />
-      <workItem from="1670926607087" duration="22663000" />
+      <workItem from="1670926607087" duration="26818000" />
     </task>
     <task id="LOCAL-00001" summary="Initial Commit">
       <created>1671022202124</created>
@@ -98,7 +103,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671022202124</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Deleted log files and added response description.">
+      <created>1671023307092</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1671023307092</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -117,7 +129,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial Commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial Commit" />
+    <MESSAGE value="Deleted log files and added response description." />
+    <option name="LAST_COMMIT_MESSAGE" value="Deleted log files and added response description." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -126,6 +139,11 @@
           <url>file://$PROJECT_DIR$/banks/def_calculator.py</url>
           <line>1</line>
           <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/banks/tink.py</url>
+          <line>25</line>
+          <option name="timeStamp" value="5" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

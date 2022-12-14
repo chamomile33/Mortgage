@@ -11,6 +11,7 @@ def sber_request(request_description):
     if response.ok:
         return _sber_refactor_response(response.json())
     logging.exception("Sber request refused.")
+    logging.exception(response.text)
     return {"Failed": 1}
 
 
@@ -69,5 +70,7 @@ def _sber_refactor_response(response):
         "OverPayment": response['data']['calculationResult']['overpayment'],
         "TotalCost": response['data']['calculationResult']['overpayment'] +
                      response['data']['calculationResult']['realtyCost'],
+        "InitialFee": response['data']['calculationResult']['realtyCost'] -
+                      response['data']['calculationResult']['creditSum'],
     }
     return data
