@@ -18,7 +18,8 @@ class CityparsespiderSpider(scrapy.Spider):
 
 
     def start_requests(self):
-        for location in range(4551, 4560):
+        for location in range(4551, 6941):
+            print(location)
             path =  f'https://www.cian.ru/map/?deal_type=sale&engine_version=2&offer_type=flat&region={location}'
             yield scrapy.Request(url=get_url(path), callback=self.parse,cb_kwargs={'id':location})
             

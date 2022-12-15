@@ -15,6 +15,7 @@ from scrapy.settings import Settings
 from MultiBank import MultiBank
 import subprocess
 import plotly.graph_objects as go
+import plotly.express as px
 
 app = Dash(__name__,external_stylesheets=[dbc.themes.BOOTSTRAP])
 banks = MultiBank()
@@ -66,11 +67,11 @@ salary = dbc.InputGroup([dbc.Input(type = 'number',min = 0,id = 'salary',step=1)
 percent_on_mortgage = dbc.InputGroup([dbc.Input(type = 'number',min = 0,max = 100,id = 'percent_on_mortgage',step=1),dbc.InputGroupText("%")])
 
 region = dbc.Input(type='text',id='region', pattern=r"^[а-яА-Я,\.-\w\s]{0,50}$")
-html_form = html.Div(style = {'width':'50%'},children=[
+html_form = html.Div(style = {'margin-left':'10px'},children=[
     dbc.Form(class_name = 'card p-1',children=[
     dbc.Row(
         [
-            dbc.Row([dbc.Col([dbc.Label("Тип квартиры",width = 'auto',style={'font-size':'17px'})],style={'margin-right':'20px'})]),
+            dbc.Row([dbc.Col([dbc.Label("Тип квартиры",width = 'auto',style={'font-size':'17px'})])]),
             dbc.Col(object_type)
         ],
         style={'margin-bottom':'10px','margin-left':'2px','margin-right':'2px'}
@@ -84,7 +85,7 @@ html_form = html.Div(style = {'width':'50%'},children=[
     ),
      dbc.Row(
         [
-            dbc.Row([dbc.Col([dbc.Label("Цена", width="auto",style={'font-size':'17px'})],style={'margin-right':'20px'})]),
+            dbc.Row([dbc.Col([dbc.Label("Цена", width="auto",style={'font-size':'17px'})])]),
             dbc.Col(price)
         ],
         style={'margin-bottom':'10px','margin-left':'2px','margin-right':'2px'}
@@ -98,7 +99,7 @@ html_form = html.Div(style = {'width':'50%'},children=[
     ),
      dbc.Row(
         [
-            dbc.Row([dbc.Col([dbc.Label("Жилая площадь", width="auto",style={'font-size':'17px'})],style={'margin-right':'20px'})]),
+            dbc.Row([dbc.Col([dbc.Label("Жилая площадь", width="auto",style={'font-size':'17px'})])]),
             dbc.Col(living_area)
         ],
         style={'margin-bottom':'10px','margin-left':'2px','margin-right':'2px'}
@@ -112,7 +113,7 @@ html_form = html.Div(style = {'width':'50%'},children=[
     ),
      dbc.Row(
         [
-            dbc.Row([dbc.Col([dbc.Label("Этаж", width="auto",style={'font-size':'17px'})],style={'margin-right':'20px'})]),
+            dbc.Row([dbc.Col([dbc.Label("Этаж", width="auto",style={'font-size':'17px'})])]),
             dbc.Col(floor)
         ],
         style={'margin-bottom':'10px','margin-left':'2px','margin-right':'2px'}
@@ -166,9 +167,14 @@ dbc.Form(class_name = 'card p-1',style={'margin-top':'20px'},children =[
     dbc.Row(dbc.Button("Count", color="primary",style={'width':'20%'},id='count'),justify='center')
 ])])
 
-app.layout = dbc.Container([
-    dbc.Col(html_form,width = '45%'),
-    dbc.Col(id = 'mortgage',width = '42%')
+app.layout = html.Div([
+    dbc.Col(html_form,style={'width':'35%','display':'inline-block'}),
+    dbc.Col(id = 'mortgage',style={'width':'60%','display':'inline-block','margin-left':'10px','margin-top':'20px', 'vertical-align':'top'},
+    children=[html.Div([
+            dbc.Row([dcc.Graph(id = 'map')]),
+            html.Label(id='mean'),
+            dbc.Row(id = 'banks')
+        ])])
 ],style={'margin-left':'0px','margin-right':'0px'})
 
 
@@ -240,22 +246,24 @@ def get_url(form_dict):
     return basic_url
 def get_figure(df):
     fig = go.Figure()
-    fig.add_trace(go.Scattermapbox(
-        lon=df['lon'],
-        lat=df['lat'],
-        mode = 'markers',
-        marker_color = "blue",
-        customdata=np.stack([df['address'], df['price'], df['url']], axis=-1),
-        hovertemplate='<br>' +
+    fig = px.scatter_mapbox(
+        df,
+        lon='lon',
+        lat='lat',
+        custom_data=['address','price','url']
+     )
+    fig.update_traces(
+            hovertemplate='<br>' +
             'Адрес: %{customdata[0]}' + '<br>' +
             'Цена: %{customdata[1]}' + '<br>' +
             'Ссылка: %{customdata[2]}' + '<br>' +
             '<extra></extra>'
-            ))
+    )
 
     fig.update_layout(
-        mapbox = dict(center = go.layout.mapbox.Center(lat=df['lat'].mean(), lon=df['lon'].mean()), zoom=7,style = 'carto-positron'),
-        title = 'Title'
+        mapbox = dict(center = go.layout.mapbox.Center(lat=df['lat'].median(), lon=df['lon'].median()), zoom=7,style = 'carto-positron'),
+        title = 'Title',
+        margin=dict(l=0, r=0, t=0, b=0)
     )
     return fig
 
@@ -342,13 +350,48 @@ def get_map(clicks,rooms,region,object_type,minprice,maxprice,minarea,maxarea,mi
             mortgage_info['InitialFee'] = down_payment
         print(mortgage_info)
         print(banks.request(mortgage_info))
-        dcc.Graph(figure = fig,style={'width': '90vh', 'height': '90vh'})
+        dcc.Graph(figure = fig)
         return html.Div([
-            dbc.Row([dcc.Graph(figure = fig,style={'width': '90vh', 'height': '90vh'}),
-            html.Label(f'Средняя стоимость квартиры = {round(df.price.mean())}')]),
-            dbc.Row(#вставить Div сюда)
+            dbc.Row([dcc.Graph(figure = fig,id = 'map')]),
+            html.Label(f'Средняя стоимость квартиры = {round(df.price.mean())}',id = 'mean'),
+            dbc.Row(html.Div(),id = 'banks')
         ])
     else:
         return  html.Label()
 
+@app.callback([Output('banks','children'),
+               Output('mean','children')],
+              [
+              Input('map', 'selectedData'),
+              State('mortgage_type','value'),
+              State('down_payment','value'),
+              State('salary','value'),
+              State('percent_on_mortgage','value'),
+              State('mean','children')]
+              )
+def change_banks_info(selectedData,mortgage_type,down_payment,salary,percent_on_mortgage,mean):
+    if selectedData is not None:
+        if len(selectedData['points'])>0:
+            point_data = selectedData['points']
+            mortgage_info = dict()
+            loan_program = 0
+            if mortgage_type == 'Ипотека для семьи с детьми':
+                loan_program = 3
+            elif mortgage_type == 'Ипотека для ИТ специалистов':
+                loan_program = 4
+            elif mortgage_type == 'Стандартная ипотека':
+                if object_type == None or object_type == 'Новостройка':
+                    loan_program = 1
+                else:
+                    loan_program = 2
+            if loan_program != 0:
+                mortgage_info['LoanProgram'] = loan_program
+            mean_price = round(np.mean(list(map(lambda x: x['customdata'][1],point_data))))
+            mortgage_info['PropertyCost'] = mean_price
+            if down_payment != None:
+                mortgage_info['InitialFee'] = down_payment
+            print(mortgage_info)
+            print(banks.request(mortgage_info))
+            return html.Div(),f'Средняя стоимость квартиры = {mean_price}'
+    return html.Div(),mean
 app.run_server(debug=True) 
