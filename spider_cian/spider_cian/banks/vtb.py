@@ -24,6 +24,7 @@ def vtb_request(request_description):
     if response.ok:
         return _vtb_refactor_response(response.json())
     logging.exception("VTB request refused.")
+    logging.exception(response.text)
     return {"Failed": 1}
 
 
@@ -77,5 +78,6 @@ def _vtb_refactor_response(response):
         "Term": response['CreditTermByCost'],
         "OverPayment": response['MonthlyPaymentByCost']*12*response['CreditTermByCost'] - response['CreditSizeByCost'],
         "TotalCost": response['MonthlyPaymentByCost']*12*response['CreditTermByCost'] + response["DownPayment"],
+        "InitialFee": response["DownPayment"],
     }
     return data

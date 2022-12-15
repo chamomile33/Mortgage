@@ -1,5 +1,7 @@
 import json
 import pandas as pd
+
+from banks.alpha import alpha_request
 from banks.sber import sber_request
 from banks.tink import tink_request
 from banks.vtb import vtb_request
@@ -58,7 +60,7 @@ class MultiBank:
         response = {"Sber": sber_request(request_description),
                     "VTB": vtb_request(request_description),
                     "Tinkoff": tink_request(request_description),
-                    # "Alpha": alpha_request(request_description)
+                    "Alpha": alpha_request(request_description)
                     }
         return response
 

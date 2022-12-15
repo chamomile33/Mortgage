@@ -9,5 +9,5 @@ import sys
 # process.start()
 
 process = CrawlerProcess(get_project_settings())
-process.crawl('SpiderCianItem', url = sys.argv[1])
+process.crawl('SpiderCianItem', url=sys.argv[1])
 process.start()
