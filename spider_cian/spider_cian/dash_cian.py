@@ -87,6 +87,7 @@ percent_on_mortgage = dbc.InputGroup(
     [dbc.Input(type='number', min=0, max=100, id='percent_on_mortgage', step=1), dbc.InputGroupText("%")])
 
 region = dbc.Input(type='text', id='region', pattern=r"^[а-яА-Я,\.-\w\s]{0,50}$")
+
 html_form = html.Div(style={'margin-left': '10px'}, children=[
     dbc.Form(class_name='card p-1', children=[
         dbc.Row(
@@ -96,6 +97,15 @@ html_form = html.Div(style={'margin-left': '10px'}, children=[
             ],
             style={'margin-bottom': '10px', 'margin-left': '2px', 'margin-right': '2px'}
         ),
+        # for banks testing without calling any scrap :p
+        # dbc.Row(
+        #    banks.get_bank_div({
+        #        "LoanProgram": 4,
+        #        "PropertyCost": 7000000,
+        #        "InitialFee": 600000,
+        #        "LoanTerm": 25,
+        #    })
+        # ),
         dbc.Row(
             [
                 dbc.Row([dbc.Col([dbc.Label("Количество комнат", width="auto", style={'font-size': '17px'})])]),
@@ -345,11 +355,11 @@ def get_map(clicks, rooms, region, object_type, minprice, maxprice, minarea, max
         form_dict['min_house_year'] = min_house_year
         form_dict['max_house_year'] = max_house_year
         url = get_url(form_dict)
-        print(url)
+        #print(url)
         p = subprocess.Popen(f'cd spider_cian && python temp.py "{url}"', stdout=subprocess.PIPE, shell=True)
         out, err = p.communicate()
         out = out.decode('cp1251')
-        print(out)
+        #print(out)
 
         ans = list(map(lambda x: x + '}', out.split('}\r\n')))[:-1]
         flats = []
@@ -360,8 +370,10 @@ def get_map(clicks, rooms, region, object_type, minprice, maxprice, minarea, max
             del temp['coordinates']
             flats.append(temp)
         df = pd.DataFrame.from_records(flats)
+        if df.empty:
+            return  html.Label('Подходящие квартиры не найдены')
         df['price'] = df['price'].astype('int')
-        print(df.info())
+        #print(df.info())
         fig = get_figure(df)
 
         mortgage_info = dict()
@@ -380,13 +392,14 @@ def get_map(clicks, rooms, region, object_type, minprice, maxprice, minarea, max
         mortgage_info['PropertyCost'] = df['price'].mean()
         if down_payment is not None:
             mortgage_info['InitialFee'] = down_payment
+
         print(mortgage_info)
         print(banks.request(mortgage_info))
         dcc.Graph(figure=fig)
         return html.Div([
             dbc.Row([dcc.Graph(figure=fig, id='map')]),
             html.Label(f'Средняя стоимость квартиры = {round(df.price.mean())}', id='mean'),
-            dbc.Row(html.Div(), id='banks')
+            dbc.Row(banks.get_bank_div(mortgage_info), id='banks')
         ])
     else:
         return html.Label()
@@ -425,8 +438,9 @@ def change_banks_info(selectedData, mortgage_type, down_payment, salary, percent
                 mortgage_info['InitialFee'] = down_payment
             print(mortgage_info)
             print(banks.request(mortgage_info))
-            return html.Div(), f'Средняя стоимость квартиры = {mean_price}'
-    return html.Div(), mean
+            return banks.get_bank_div(mortgage_info), f'Средняя стоимость квартиры = {mean_price}'
+    return banks.get_bank_div({"Failed": 1}), mean
 
 
 app.run_server(debug=True)
+

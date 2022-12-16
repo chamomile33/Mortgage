@@ -1,8 +1,6 @@
-import requests
 import json
-from MultiBank import MultiBank
-from banks.tink import tink_request
-from banks.def_calculator import calc
+from spider_cian.spider_cian.MultiBank import MultiBank
+
 parser = MultiBank()
 parser.request()
 data = {

@@ -23,7 +23,7 @@ def tink_init():
 def tink_request(request_description):
     if _request_failed(request_description):
         logging.exception("Tink refused. Unable to give program.")
-        return {"Failed: 1"}
+        return {"Failed": 1}
     rate = _tink[request_description["LoanProgram"]-1]
     term = request_description["LoanTerm"]
     deposit = request_description["InitialFee"]

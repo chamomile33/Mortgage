@@ -27,7 +27,7 @@ def alpha_init():
 
 def alpha_request(request_description):
     if _request_failed(request_description):
-        return {"Failed: 1"}
+        return {"Failed": 1}
     rate = _alpha[request_description["LoanProgram"]-1]
     term = request_description["LoanTerm"]
     deposit = request_description["InitialFee"]
