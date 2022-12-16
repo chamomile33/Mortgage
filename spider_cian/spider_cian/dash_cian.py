@@ -313,11 +313,11 @@ def get_map(clicks,rooms,region,object_type,minprice,maxprice,minarea,maxarea,mi
         form_dict['min_house_year'] = min_house_year
         form_dict['max_house_year'] = max_house_year
         url = get_url(form_dict)
-        print(url)
+        #print(url)
         p = subprocess.Popen(f'cd spider_cian && python temp.py "{url}"', stdout=subprocess.PIPE, shell=True)
         out, err = p.communicate()
         out = out.decode('cp1251')
-        print(out)
+        #print(out)
 
         ans = list(map(lambda x: x + '}' , out.split('}\r\n')))[:-1]
         flats = []
@@ -328,8 +328,10 @@ def get_map(clicks,rooms,region,object_type,minprice,maxprice,minarea,maxarea,mi
             del temp['coordinates']
             flats.append(temp)
         df = pd.DataFrame.from_records(flats)
+        if df.empty:
+            return  html.Label('Подходящие квартиры не найдены')
         df['price'] = df['price'].astype('int')
-        print(df.info())
+        #print(df.info())
         fig = get_figure(df)
 
         mortgage_info = dict()
@@ -348,8 +350,9 @@ def get_map(clicks,rooms,region,object_type,minprice,maxprice,minarea,maxarea,mi
         mortgage_info['PropertyCost'] = df['price'].mean()
         if down_payment != None:
             mortgage_info['InitialFee'] = down_payment
-        print(mortgage_info)
-        print(banks.request(mortgage_info))
+        #print(mortgage_info)
+        
+        #print(banks.request(mortgage_info))
         dcc.Graph(figure = fig)
         return html.Div([
             dbc.Row([dcc.Graph(figure = fig,id = 'map')]),

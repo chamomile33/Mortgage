@@ -4,7 +4,7 @@ from spider_cian.items import RegionId
 import re
 
 
-API = '0b850001503ff83ce6ac36c5b2a30bd8'
+API = 'c0069beb54f055d1b2629da27d9f3a12'
 
 def get_url(url):
     payload = {'api_key': API, 'url': url}
