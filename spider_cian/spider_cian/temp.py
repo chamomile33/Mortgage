@@ -4,10 +4,6 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.settings import Settings
 import sys
 
-# process = CrawlerProcess(settings=get_project_settings())
-# process.crawl('CityParseSpider')
-# process.start()
-
 process = CrawlerProcess(get_project_settings())
 process.crawl('SpiderCianItem', url=sys.argv[1])
 process.start()

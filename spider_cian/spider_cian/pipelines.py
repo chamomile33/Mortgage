@@ -15,11 +15,10 @@ class SpiderCianPipeline:
             self.file = open('items.csv', 'w',encoding='utf-8',newline='')
             self.writer = csv.writer(self.file)
             self.writer.writerow(['name','id'])
-        else:
-            self.file = open('items.csv', 'r',encoding='utf-8')
 
     def close_spider(self, spider): 
-        self.file.close()
+        if 'City' in spider.name:
+            self.file.close()
 
     def process_item(self, item, spider):
         if 'City' in spider.name:
